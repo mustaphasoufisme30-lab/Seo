@@ -1,69 +1,29 @@
-import {
-  buildDefaultCrawl,
-  buildDefaultPageSpeed,
-  buildFallbackAuditReport,
-  normalizeAuditRequest,
-} from '../server/auditHelpers.js';
-import { crawlStore, fetchPageSpeed } from '../server/crawl.js';
-import { generateEcommerceSeoAudit } from '../server/gemini.js';
-
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Méthode non autorisée. Utilisez POST.' });
-    return;
-  }
+  const { url } = req.query;
+  if (!url) return res.status(400).json({ error: "URL manquante" });
 
-  const request = normalizeAuditRequest(req.body || {});
-  let crawl = buildDefaultCrawl(request.url);
-  let pageSpeed = buildDefaultPageSpeed();
+  const apiKey = process.env.PAGESPEED_API_KEY;
+  const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile&category=performance&category=seo&category=accessibility&category=best-practices&key=${apiKey}`;
 
   try {
-    const [crawlRes, speedRes] = await Promise.allSettled([
-      crawlStore(request.url),
-      fetchPageSpeed(request.url),
-    ]);
+    const response = await fetch(apiUrl);
+    const data = await response.json();
 
-    if (crawlRes.status === 'fulfilled' && crawlRes.value) {
-      crawl = {
-        ...buildDefaultCrawl(request.url),
-        ...crawlRes.value,
-        homepage: {
-          ...buildDefaultCrawl(request.url).homepage,
-          ...(crawlRes.value.homepage || {}),
-        },
-        categories: Array.isArray(crawlRes.value.categories) ? crawlRes.value.categories : [],
-        products: Array.isArray(crawlRes.value.products) ? crawlRes.value.products : [],
-      };
-    }
-
-    if (speedRes.status === 'fulfilled' && speedRes.value) {
-      pageSpeed = {
-        mobileScore: Number(speedRes.value.mobileScore) || 0,
-        desktopScore: Number(speedRes.value.desktopScore) || 0,
-      };
-    }
-
-    const report = await generateEcommerceSeoAudit(request, crawl, pageSpeed);
+    const lighthouse = data.lighthouseResult;
+    const categories = lighthouse.categories;
 
     res.status(200).json({
-      request,
-      crawl,
-      pageSpeed,
-      report,
+      url: url,
+      performance: Math.round(categories.performance.score * 100),
+      seo: Math.round(categories.seo.score * 100),
+      accessibility: Math.round(categories.accessibility.score * 100),
+      bestPractices: Math.round(categories["best-practices"].score * 100),
+      speed: lighthouse.audits["speed-index"].displayValue,
+      lcp: lighthouse.audits["largest-contentful-paint"].displayValue,
+      cls: lighthouse.audits["cumulative-layout-shift"].displayValue,
+      audits: lighthouse.audits
     });
-  } catch (error) {
-    console.error('Audit handler fallback:', error?.message || error);
-    const report = buildFallbackAuditReport(
-      request,
-      crawl,
-      pageSpeed,
-      'Analyse partielle - données du site limitées'
-    );
-    res.status(200).json({
-      request,
-      crawl,
-      pageSpeed,
-      report,
-    });
+  } catch (e) {
+    res.status(500).json({ error: "Erreur audit" });
   }
 }
