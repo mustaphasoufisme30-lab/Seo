@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowRight, Globe, Loader2, Lock, Sparkles } from 'lucide-react';
+import { ArrowRight, ExternalLink, Globe, KeyRound, Loader2, Lock, Sparkles } from 'lucide-react';
 import type { AuditRequest, StorePlatform } from '../types/seo';
+import { PAYHIP_CHECKOUT_URL } from '../config/licenses';
 
 interface AuditFormProps {
   value: AuditRequest;
@@ -10,6 +11,7 @@ interface AuditFormProps {
   canRunFreeAudit: boolean;
   plan: 'free' | 'premium';
   onGoPricing: () => void;
+  onOpenLicenseModal?: () => void;
 }
 
 const PLATFORMS: StorePlatform[] = ['Shopify', 'WooCommerce', 'PrestaShop', 'Autre'];
@@ -22,6 +24,7 @@ export const AuditForm: React.FC<AuditFormProps> = ({
   canRunFreeAudit,
   plan,
   onGoPricing,
+  onOpenLicenseModal,
 }) => {
   const [validationError, setValidationError] = useState<string>('');
   const isLocked = !canRunFreeAudit && plan === 'free';
@@ -98,14 +101,34 @@ export const AuditForm: React.FC<AuditFormProps> = ({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onGoPricing}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 whitespace-nowrap shrink-0"
-          >
-            Passer au Premium
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {onOpenLicenseModal && (
+              <button
+                type="button"
+                onClick={onOpenLicenseModal}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-100 transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 whitespace-nowrap"
+              >
+                <KeyRound className="h-4 w-4" aria-hidden="true" />
+                J’ai déjà ma clé
+              </button>
+            )}
+            <a
+              href={PAYHIP_CHECKOUT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 whitespace-nowrap"
+            >
+              Passer au Premium
+              <ExternalLink className="h-4 w-4" aria-hidden="true" />
+            </a>
+            <button
+              type="button"
+              onClick={onGoPricing}
+              className="text-xs font-medium text-slate-600 dark:text-slate-400 underline hover:text-slate-900 dark:hover:text-slate-100 whitespace-nowrap"
+            >
+              Voir les tarifs
+            </button>
+          </div>
         </div>
       </section>
     );

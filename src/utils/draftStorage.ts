@@ -33,6 +33,7 @@ export interface StoredDrafts {
 export interface UsageState {
   freeAuditsUsed: number;
   plan: 'free' | 'premium';
+  licenseKey?: string;
 }
 
 export const DEFAULT_AUDIT_REQUEST: AuditRequest = {
@@ -132,6 +133,7 @@ export function loadUsageState(): UsageState {
     return {
       freeAuditsUsed: Number(parsed.freeAuditsUsed) || 0,
       plan: parsed.plan === 'premium' ? 'premium' : 'free',
+      licenseKey: typeof parsed.licenseKey === 'string' ? parsed.licenseKey : undefined,
     };
   } catch {
     return { freeAuditsUsed: 0, plan: 'free' };

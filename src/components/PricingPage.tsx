@@ -1,10 +1,11 @@
 import React from 'react';
-import { ArrowRight, Check, RotateCcw } from 'lucide-react';
+import { ArrowRight, Check, ExternalLink, KeyRound, RotateCcw } from 'lucide-react';
 import type { UsageState } from '../utils/draftStorage';
+import { PAYHIP_CHECKOUT_URL } from '../config/licenses';
 
 interface PricingPageProps {
   usage: UsageState;
-  onActivatePremium: () => void;
+  onOpenLicenseModal: () => void;
   onResetQuota: () => void;
   onGoAudit: () => void;
 }
@@ -44,7 +45,7 @@ const COMPARISON_ROWS = [
 
 export const PricingPage: React.FC<PricingPageProps> = ({
   usage,
-  onActivatePremium,
+  onOpenLicenseModal,
   onResetQuota,
   onGoAudit,
 }) => {
@@ -174,7 +175,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({
             {usage.plan === 'premium' ? (
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-                  Accès Premium activé dans cette session
+                  Premium activé ! 🎉{usage.licenseKey ? ` (${usage.licenseKey})` : ''}
                 </span>
                 <button
                   type="button"
@@ -185,14 +186,25 @@ export const PricingPage: React.FC<PricingPageProps> = ({
                 </button>
               </div>
             ) : (
-              <button
-                type="button"
-                onClick={onActivatePremium}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 whitespace-nowrap"
-              >
-                Activer l’accès Premium
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </button>
+              <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                <a
+                  href={PAYHIP_CHECKOUT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 whitespace-nowrap"
+                >
+                  Activer Premium
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                </a>
+                <button
+                  type="button"
+                  onClick={onOpenLicenseModal}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-100 transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 whitespace-nowrap"
+                >
+                  <KeyRound className="h-4 w-4" aria-hidden="true" />
+                  J’ai déjà ma clé
+                </button>
+              </div>
             )}
           </div>
         </section>
