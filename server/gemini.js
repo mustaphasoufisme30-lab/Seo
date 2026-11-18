@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
 import {
   buildFallbackAuditReport,
   normalizeAuditRequest,
@@ -185,6 +185,7 @@ ${isEmptySite ? `2. ATTENTION : le crawl du site est vide ou très limité (ex: 
           'Tu réponds uniquement en JSON valide conforme au schéma fourni. Tout le contenu textuel doit être en français professionnel et orienté ROI e-commerce.',
         responseMimeType: 'application/json',
         responseSchema: AUDIT_RESPONSE_SCHEMA,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
 
@@ -365,6 +366,7 @@ Produis un contenu structuré, naturel (sans bourrage de mots-clés), directemen
         systemInstruction: 'Réponds uniquement en JSON valide en français conforme au schéma.',
         responseMimeType: 'application/json',
         responseSchema: CONTENT_RESPONSE_SCHEMA,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
     const parsed = JSON.parse((response?.text || '{}').trim());
@@ -511,6 +513,7 @@ NOTES MARCHAND : ${rawNotes || 'Aucune'}`;
         systemInstruction: 'Réponds uniquement en JSON valide conforme au schéma, avec 6 à 8 recommandations précises en français.',
         responseMimeType: 'application/json',
         responseSchema: GSC_RESPONSE_SCHEMA,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       },
     });
     const parsed = JSON.parse((response?.text || '{}').trim());

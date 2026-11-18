@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Globe, Loader2, Sparkles } from 'lucide-react';
+import { ArrowRight, Globe, Loader2, Lock, Sparkles } from 'lucide-react';
 import type { AuditRequest, StorePlatform } from '../types/seo';
 
 interface AuditFormProps {
@@ -24,6 +24,7 @@ export const AuditForm: React.FC<AuditFormProps> = ({
   onGoPricing,
 }) => {
   const [validationError, setValidationError] = useState<string>('');
+  const isLocked = !canRunFreeAudit && plan === 'free';
 
   const updateField = <K extends keyof AuditRequest>(field: K, fieldValue: AuditRequest[K]) => {
     setValidationError('');
@@ -32,6 +33,10 @@ export const AuditForm: React.FC<AuditFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLocked) {
+      setValidationError('Votre audit gratuit a déjà été utilisé. Passez en Premium pour lancer des audits illimités.');
+      return;
+    }
     if (!value.url.trim()) {
       setValidationError('Veuillez saisir l’URL de votre boutique (ex: https://maboutique.fr).');
       return;
@@ -42,10 +47,6 @@ export const AuditForm: React.FC<AuditFormProps> = ({
     }
     if (!value.niche.trim()) {
       setValidationError('Veuillez préciser la niche de votre boutique.');
-      return;
-    }
-    if (!canRunFreeAudit && plan === 'free') {
-      setValidationError('Votre audit gratuit a déjà été utilisé. Passez en Premium pour lancer des audits illimités.');
       return;
     }
     setValidationError('');
@@ -74,6 +75,41 @@ export const AuditForm: React.FC<AuditFormProps> = ({
       });
     }
   };
+
+  if (isLocked) {
+    return (
+      <section
+        data-testid="audit-locked-gate"
+        aria-label="Audit verrouillé"
+        className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8"
+      >
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400">
+              <Lock className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                Audit verrouillé — Passez au Premium
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
+                Votre test gratuit offert a déjà été utilisé. Activez l’accès Premium pour débloquer de nouveaux audits illimités. Votre rapport déjà généré reste consultable et exportable ci-dessous.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onGoPricing}
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-800 whitespace-nowrap shrink-0"
+          >
+            Passer au Premium
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <form

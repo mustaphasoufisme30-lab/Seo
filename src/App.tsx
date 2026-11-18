@@ -25,6 +25,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ContentGeneratorPage } from './components/ContentGeneratorPage';
 import { GscAnalyzerPage, type GscManualDraft } from './components/GscAnalyzerPage';
 import { PricingPage } from './components/PricingPage';
+import { HomeFaqSection } from './components/HomeFaqSection';
 
 type ActivePage = 'audit' | 'content' | 'gsc' | 'pricing';
 
@@ -391,6 +392,8 @@ export default function App() {
                 </div>
               </section>
             )}
+
+            <HomeFaqSection />
           </div>
         )}
 

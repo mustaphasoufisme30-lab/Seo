@@ -146,14 +146,6 @@ export const PricingPage: React.FC<PricingPageProps> = ({
             <h2 className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">
               Premium Croissance
             </h2>
-            <div className="mt-4 flex items-baseline gap-1">
-              <span className="text-4xl font-bold tabular-nums text-slate-900 dark:text-slate-100">
-                49 €
-              </span>
-              <span className="text-sm text-slate-500 dark:text-slate-400">
-                HT / mois · sans engagement
-              </span>
-            </div>
             <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
               Conçu pour les e-commerçants qui déploient de nouvelles collections chaque mois et suivent leurs concurrents de près.
             </p>
