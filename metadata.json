@@ -1,0 +1,8 @@
+{
+  "name": "SEO Boutique IA",
+  "description": "Plateforme d'audit SEO e-commerce en français, générateur de contenus optimisés et analyse Google Search Console sans API complexe.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
